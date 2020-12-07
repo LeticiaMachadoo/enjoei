@@ -1,6 +1,6 @@
 <template>
   <div>
-    <vSearchField v-bind:onChange="onChange" />
+    <vSearchField v-bind:value="this.searchTerm" v-bind:onChange="onChange" />
     <div :class="'c-products-list'">
       <div
         :class="'c-product'"
@@ -12,11 +12,14 @@
             v-bind:image-id="product.node.photo.image_public_id"
             v-bind:title="product.node.title.name"
             v-bind:path="product.node.path"
+            v-bind:price="product.node.price"
           />
         </div>
       </div>
     </div>
+    <vNotFound v-bind:clearFilter="onChange" v-if="!products.length" />
     <vPagination
+      v-if="products.length"
       v-bind:totalRecords="totalRecords"
       v-bind:currentPage="currentPage"
       v-bind:itemsPerPage="itemPerPage"
@@ -30,6 +33,9 @@
   align-items: flex-start;
   display: flex;
   flex-wrap: wrap;
+  @media (max-width: 576px) {
+    padding-bottom: 2.2rem;
+  }
 }
 .c-product {
   margin: auto;
@@ -37,15 +43,66 @@
   margin-top: 0;
   width: 20%;
 
+  @media (max-width: 992px) {
+    width: 25%;
+  }
+
+  @media (max-width: 768px) {
+    width: 33.33333333333333%;
+  }
+
+  @media (max-width: 576px) {
+    width: 50%;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 375px) {
+    width: 100%;
+  }
+
   .c-product-image {
     height: 100%;
     padding-right: 2.4rem;
     width: 100%;
+
+    @media (max-width: 375px) {
+      padding-right: 0;
+    }
+
+    @media screen and (max-width: 768px) and (min-width: 375px) {
+      padding-right: 1rem;
+    }
   }
 
-  &:nth-child(5n) {
-    .c-product-image {
-      padding-right: 0;
+  @media screen and (min-width: 992px) {
+    &:nth-child(5n) {
+      .c-product-image {
+        padding-right: 0;
+      }
+    }
+  }
+
+  @media screen and (max-width: 992px) and (min-width: 768px) {
+    &:nth-child(4n) {
+      .c-product-image {
+        padding-right: 0;
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) and (min-width: 576px) {
+    &:nth-child(3n) {
+      .c-product-image {
+        padding-right: 0;
+      }
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    &:nth-child(even) {
+      .c-product-image {
+        padding-right: 0;
+      }
     }
   }
 }
@@ -53,22 +110,25 @@
 
 <script>
 import axios from "axios";
-import vProductCard from "@/components/product-card.vue";
-import vSearchField from "@/components/search-field.vue";
-import vPagination from "@/components/pagination.vue";
+import { get } from "lodash";
+import vProductCard from "@/components/productCard/product-card.vue";
+import vSearchField from "@/components/search/search-field.vue";
+import vPagination from "@/components/pagination/pagination.vue";
+import vNotFound from "@/components/notFound/not-found.vue";
 
 export default {
   components: {
     vProductCard,
     vSearchField,
-    vPagination
+    vPagination,
+    vNotFound
   },
   data() {
     return {
       products: [],
       searchTerm: "",
       totalRecords: 1000,
-      itemPerPage: 10,
+      itemPerPage: 15,
       currentPage: 0,
       alignments: ["start", "center", "end"],
       lastItem: this.products
@@ -81,7 +141,7 @@ export default {
       this.currentPage = sum ? this.currentPage + 1 : this.currentPage - 1;
     },
     onChange(event) {
-      this.searchTerm = event.target.value;
+      this.searchTerm = get(event, "target.value", "");
     },
     listProducts() {
       axios

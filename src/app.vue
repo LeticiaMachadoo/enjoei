@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import vContainer from "@/components/container.vue";
-import vHeader from "@/components/header.vue";
+import vContainer from "@/components/container/container.vue";
+import vHeader from "@/components/header/header.vue";
 
 export default {
   components: {

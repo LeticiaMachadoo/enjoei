@@ -19,7 +19,7 @@ export default {
 .c-header {
   align-items: center;
   display: flex;
-  border-bottom: 0.1rem solid #f1eeec;
+  border-bottom: 0.1rem solid var(--color-border);
   height: 7rem;
   justify-content: center;
   margin-bottom: 2.4rem;
